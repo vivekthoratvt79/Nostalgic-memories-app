@@ -8,6 +8,7 @@ import {
   Segment,
   Accordion,
   Icon,
+  Progress,
 } from 'semantic-ui-react';
 import memories from '../Images/camera.jpeg';
 import FileBase from 'react-file-base64';
@@ -20,9 +21,10 @@ const Forms = () => {
   if (windowSize.current[0] > 991) {
     initailActiveIndex = 0;
   }
+  const dispatch = useDispatch();
 
   const [state, setState] = useState({ activeIndex: initailActiveIndex });
-
+  const [showProgress, setShowProgress] = useState({ show: false, value: 0 });
   const [postData, setPostData] = useState({
     creator: '',
     title: '',
@@ -34,20 +36,49 @@ const Forms = () => {
     const { index } = titleProps;
     const { activeIndex } = state;
     const newIndex = activeIndex === index ? -1 : index;
-
     setState({ activeIndex: newIndex });
   };
-
   const { activeIndex } = state;
-
-  const dispatch = useDispatch();
 
   const handleChange = (e, { name, value }) => {
     setPostData({ ...postData, [name]: value });
   };
+
   const handleSubmit = (e) => {
+    setShowProgress({ show: true, value: 50 });
     e.preventDefault();
+    const { creator, title, message, tags, selectedFile } = postData;
+    if (!creator || !title || !message || !tags || !selectedFile) {
+      if (!selectedFile) {
+        document.getElementById('file-select-message').innerText =
+          'Please upload a picture.';
+        setTimeout(() => {
+          document.getElementById('file-select-message').innerText = '';
+        }, 3000);
+      }
+      setShowProgress({ show: false, value: 25 });
+      return false;
+    }
+    document.getElementById('file-select-message').innerText = '';
+
     dispatch(createPost(postData));
+    setPostData({
+      creator: '',
+      title: '',
+      message: '',
+      tags: '',
+      selectedFile: '',
+    });
+    setShowProgress({ show: true, value: 100 });
+    document.getElementById('base64-input-parent').childNodes[0].value = '';
+    if (windowSize.current[0] > 991) {
+      initailActiveIndex = 0;
+    } else {
+      setState({ activeIndex: null });
+    }
+    setTimeout(() => {
+      setShowProgress({ show: false, value: 25 });
+    }, 1500);
   };
 
   return (
@@ -79,6 +110,14 @@ const Forms = () => {
               </Header>
             </Button>
           </Accordion.Title>
+          {showProgress.show ? (
+            <Progress percent={showProgress.value} color='green' progress>
+              Uploaded Successfully
+            </Progress>
+          ) : (
+            ''
+          )}
+
           <Accordion.Content active={activeIndex === 0}>
             <Form size='large' onSubmit={handleSubmit} className='post-form'>
               <Segment stacked>
@@ -90,6 +129,7 @@ const Forms = () => {
                   name='creator'
                   value={postData.creator}
                   onChange={handleChange}
+                  required
                 />
                 <Form.Input
                   fluid
@@ -99,6 +139,7 @@ const Forms = () => {
                   name='title'
                   value={postData.title}
                   onChange={handleChange}
+                  required
                 />
                 <Form.Input
                   fluid
@@ -108,17 +149,19 @@ const Forms = () => {
                   name='message'
                   value={postData.message}
                   onChange={handleChange}
+                  required
                 />
                 <Form.Input
                   fluid
                   icon='tags'
                   iconPosition='left'
-                  placeholder='Tags'
+                  placeholder='Tags with comma separated'
                   name='tags'
                   value={postData.tags}
                   onChange={handleChange}
+                  required
                 />
-                <div className='field'>
+                <div className='field' id='base64-input-parent'>
                   <FileBase
                     type='file'
                     multiple={false}
@@ -126,6 +169,7 @@ const Forms = () => {
                       setPostData({ ...postData, selectedFile: base64 })
                     }
                   />
+                  <span id='file-select-message'></span>
                 </div>
 
                 <Button color='teal' fluid size='large' type='submit'>

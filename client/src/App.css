@@ -5,7 +5,7 @@
     ),
     url(https://img.freepik.com/free-vector/hand-painted-watercolor-pastel-sky-background_23-2148902771.jpg);
   background-size: cover;
-  height: inherit;
+  /* height: inherit; */
 }
 
 .form-header {
@@ -38,10 +38,10 @@
   border-radius: 10px;
 }
 
-.card > .image > img {
+/* .card > .image > img {
   max-height: 300px;
   object-fit: contain;
-}
+} */
 
 .main-header {
   color: #00b5ad !important;
@@ -60,6 +60,71 @@
   box-shadow: rgb(0 0 0 / 25%) 0px 25px 50px -12px !important;
 }
 
+.edit-icon {
+  color: #057e79;
+}
+.save-icon {
+  color: darkgreen;
+  font-size: 24px !important;
+}
+
+.div-editable {
+  -webkit-user-modify: read-write;
+  -moz-user-modify: read-write;
+  user-modify: read-write;
+  padding: 5px;
+  border: 1px solid gray;
+  border-radius: 5px;
+}
+
+.div-editable::after {
+  content: '|';
+  animation-name: blink;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease;
+}
+.div-editable:focus {
+  background-color: rgb(207 239 236);
+}
+.div-editable:focus::after {
+  content: '';
+}
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.card-by-card {
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px !important;
+  background: transparent !important;
+}
+
+.card-by-card > .image > img {
+  height: 250px !important;
+  object-fit: contain !important;
+}
+
+.card-desc {
+  margin-bottom: 0px !important;
+}
+
+.tag-icon {
+  margin-right: -1.5px !important;
+}
+
+.disabled-edit {
+  pointer-events: none !important;
+}
+
+#file-select-message {
+  color: red;
+}
+
 @media only screen and (max-width: 991px) {
   .divided > .six > .accordion > .aligned {
     height: auto !important;
@@ -67,10 +132,12 @@
 }
 
 @media only screen and (max-width: 767px) {
-  #root {
-    height: unset;
-  }
   .card-grp-container {
     padding-top: 1rem !important;
+  }
+}
+@media only screen and (max-width: 982px) {
+  #root {
+    height: unset;
   }
 }

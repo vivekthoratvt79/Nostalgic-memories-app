@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Header, Icon, Image } from 'semantic-ui-react';
+import { Header, Icon } from 'semantic-ui-react';
 import Posts from './components/Posts';
 import { useDispatch } from 'react-redux';
 import { getPosts } from './actions/posts';
@@ -17,7 +17,7 @@ const App = () => {
       <Header as='h2' block textAlign='center' className='main-header'>
         Nostalgic - Memories
         <Header.Subheader>
-          Share and re-live memories with us <Icon name='smile outline' />
+          Share and re-live your memories with us <Icon name='smile outline' />
         </Header.Subheader>
       </Header>
       <Posts />

@@ -6,7 +6,6 @@ import { useSelector } from 'react-redux';
 
 const Posts = () => {
   const posts = useSelector((state) => state.posts);
-  console.log(posts);
   return !posts.length ? (
     <Dimmer active inverted>
       <Loader size='medium'>Loading</Loader>
