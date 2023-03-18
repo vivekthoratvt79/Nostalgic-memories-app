@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Button,
   Form,
@@ -14,6 +14,7 @@ import memories from '../Images/camera.jpeg';
 import FileBase from 'react-file-base64';
 import { useDispatch } from 'react-redux';
 import { createPost } from '../actions/posts';
+import { useNavigate } from 'react-router-dom';
 
 const Forms = () => {
   const windowSize = useRef([window.innerWidth, window.innerHeight]);
@@ -21,12 +22,14 @@ const Forms = () => {
   if (windowSize.current[0] > 991) {
     initailActiveIndex = 0;
   }
+  const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const user = JSON.parse(localStorage.getItem('profile'));
 
   const [state, setState] = useState({ activeIndex: initailActiveIndex });
   const [showProgress, setShowProgress] = useState({ show: false, value: 0 });
   const [postData, setPostData] = useState({
-    creator: '',
     title: '',
     message: '',
     tags: '',
@@ -47,8 +50,8 @@ const Forms = () => {
   const handleSubmit = (e) => {
     setShowProgress({ show: true, value: 50 });
     e.preventDefault();
-    const { creator, title, message, tags, selectedFile } = postData;
-    if (!creator || !title || !message || !tags || !selectedFile) {
+    const { title, message, tags, selectedFile } = postData;
+    if (!title || !message || !tags || !selectedFile) {
       if (!selectedFile) {
         document.getElementById('file-select-message').innerText =
           'Please upload a picture.';
@@ -61,9 +64,8 @@ const Forms = () => {
     }
     document.getElementById('file-select-message').innerText = '';
 
-    dispatch(createPost(postData));
+    dispatch(createPost({ ...postData, name: user?.result?.name }));
     setPostData({
-      creator: '',
       title: '',
       message: '',
       tags: '',
@@ -80,6 +82,20 @@ const Forms = () => {
       setShowProgress({ show: false, value: 25 });
     }, 1500);
   };
+  if (!user?.result?.name) {
+    return (
+      <Button
+        className='login-to-post'
+        basic
+        fluid
+        color='red'
+        style={{ width: '100%' }}
+        onClick={() => navigate('/auth')}
+      >
+        &nbsp;&nbsp;Log In to Post your Memory&nbsp;
+      </Button>
+    );
+  }
 
   return (
     <Accordion>
@@ -121,16 +137,6 @@ const Forms = () => {
           <Accordion.Content active={activeIndex === 0}>
             <Form size='large' onSubmit={handleSubmit} className='post-form'>
               <Segment stacked>
-                <Form.Input
-                  fluid
-                  icon='user'
-                  iconPosition='left'
-                  placeholder='Creator name'
-                  name='creator'
-                  value={postData.creator}
-                  onChange={handleChange}
-                  required
-                />
                 <Form.Input
                   fluid
                   icon='write'

@@ -6,6 +6,7 @@ import {
   deletePost,
   likePost,
 } from '../controllers/posts.js';
+import auth from '../middleware/auth.js';
 
 // import all controllers
 // import SessionController from './app/controllers/SessionController';
@@ -13,9 +14,9 @@ import {
 const router = express.Router();
 
 router.get('/', getPosts);
-router.post('/', createPost);
-router.patch('/:id', updatePost);
-router.delete('/:id', deletePost);
-router.patch('/likePost/:id', likePost);
+router.post('/', auth, createPost);
+router.patch('/:id',auth, updatePost);
+router.delete('/:id',auth, deletePost);
+router.patch('/likePost/:id', auth, likePost);
 
 export default router;

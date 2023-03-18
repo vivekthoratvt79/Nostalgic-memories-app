@@ -11,7 +11,11 @@ export const getPosts = async (req, res) => {
 
 export const createPost = async (req, res) => {
   const post = req.body;
-  const newPost = new PostMessage(post);
+  const newPost = new PostMessage({
+    ...post,
+    creator: req.userId,
+    createdAt: new Date().toISOString(),
+  });
   try {
     await newPost.save();
     res.status(201).json(newPost);
@@ -22,11 +26,11 @@ export const createPost = async (req, res) => {
 
 export const updatePost = async (req, res) => {
   const _id = req.params.id;
-  const { title, message, tags, creator } = req.body;
+  const { title, message, tags } = req.body;
   try {
     const post = await PostMessage.findByIdAndUpdate(
       { _id },
-      { title, message, tags, creator },
+      { title, message, tags },
       { new: true }
     );
     res.status(200).json(post);
@@ -47,13 +51,20 @@ export const deletePost = async (req, res) => {
 
 export const likePost = async (req, res) => {
   const _id = req.params.id;
+  if (!req.userId) return res.json({ message: 'Unauthenticated' });
   try {
-    const post = await PostMessage.findByIdAndUpdate(
-      { _id },
-      { $inc: { likeCount: 1 } },
-      { new: true }
-    );
-    res.status(200).json(post);
+    const post = await PostMessage.findById(_id);
+    const index = post.likes.findIndex((id) => id === String(req.userId));
+    if (index === -1) {
+      post.likes.push(req.userId);
+    } else {
+      //dislike
+      post.likes = post.likes.filter((id) => id !== String(req.userId));
+    }
+    const updatePost = await PostMessage.findByIdAndUpdate({ _id }, post, {
+      new: true,
+    });
+    res.status(200).json(updatePost);
   } catch (error) {
     res.status(409).json({ message: error.message });
   }

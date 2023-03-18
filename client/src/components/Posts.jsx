@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Grid, Card, Dimmer, Loader, Icon, Header } from 'semantic-ui-react';
 import Forms from './Forms';
 import Post from './Post';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { getPosts } from '../actions/posts';
 
 const Posts = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getPosts());
+  }, [dispatch]);
   const posts = useSelector((state) => state.posts);
   return !posts.length ? (
     <Dimmer active inverted>
